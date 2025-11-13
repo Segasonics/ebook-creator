@@ -804,7 +804,7 @@ export const exportAsPdf = asyncHandler(async (req: Request, res: Response) => {
   //Create Pdf with safe settings
   const doc = new PDFDocument({
     margins: { top: 72, bottom: 72, left: 72, right: 72 },
-    bufferPages: true,
+    bufferPages: true, //keeps all pages in memory (so you can re-order or modify them later if needed).
     autoFirstPage: true,
   });
 

@@ -8,6 +8,7 @@ import ViewbookPage from "./pages/ViewbookPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
           }
         />
       </Routes>
+      <Toaster />
     </div>
   );
 };
