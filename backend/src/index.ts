@@ -21,6 +21,8 @@ app.use(
 
 connectDB();
 
+console.log("dirname", __dirname);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

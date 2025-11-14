@@ -8,8 +8,8 @@ export const API_PATHS = {
     CREATE_BOOK: "/book",
     GET_BOOKS: "/book",
     GET_BOOK_BY_ID: "/book/:id",
-    UPDATE_BOOK: "/book/:id",
-    DELETE_BOOK: "/book/:id",
+    UPDATE_BOOK: "/book",
+    DELETE_BOOK: "/book",
     UPDATE_BOOK_COVER: "/book/:id/cover",
   },
   AI: {
@@ -22,4 +22,4 @@ export const API_PATHS = {
   },
 };
 
-export const BASE_URL = "http://localhost:3000";
+export const BASE_URL = "http://localhost:8000";
