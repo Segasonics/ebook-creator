@@ -1,7 +1,301 @@
-import React from "react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Plus,
+  Sparkles,
+  Trash2,
+  ArrowLeft,
+  BookOpen,
+  Hash,
+  Lightbulb,
+  Palette,
+} from "lucide-react";
+import Modal from "../ui/Modal";
+import InputField from "../ui/InputField";
+import SelectField from "../ui/SelectField";
+import Button from "../ui/Button";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPath";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
-const CreateBookModal = () => {
-  return <div></div>;
+const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
+  const { user } = useAuth();
+
+  const [step, setStep] = useState(1);
+  const [bookTitle, setBookTitle] = useState("");
+  const [numChapters, setNumChapters] = useState(5);
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiStyle, setAiStyle] = useState("Informative");
+  const [chapters, setChapters] = useState([]);
+  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
+  const [isFinalizingBook, setIsFinalizingBook] = useState(false);
+  const chaptersContainerRef = useRef(null);
+
+  const resetModal = () => {
+    setStep(1);
+    setBookTitle("");
+    setNumChapters(5);
+    setAiTopic("");
+    setAiStyle("Informative");
+    setChapters([]);
+    setIsGeneratingOutline(false);
+    setIsFinalizingBook(false);
+  };
+
+  const handleGenerateOutline = async () => {
+    if (!bookTitle || !numChapters) {
+      toast.error("Please provide a book title and number of chapters.");
+      return;
+    }
+    setIsGeneratingOutline(true);
+    try {
+      const response = await axiosInstance.post(API_PATHS.AI.GENERATE_OUTLINE, {
+        topic: bookTitle,
+        description: aiTopic || "",
+        style: aiStyle,
+        numChapters: numChapters,
+      });
+      setChapters(response.data.data);
+      setStep(2);
+      toast.success("Outline generated successfully! Please review and edit.");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to generate outline. Please try again."
+      );
+    } finally {
+      setIsGeneratingOutline(false);
+    }
+  };
+
+  const handleChapterChange = (index, field, value) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[index][field] = value;
+    setChapters(updatedChapters);
+  };
+
+  const handleDeleteChapter = (index) => {
+    if (chapters.length <= 1) return;
+    setChapters(chapters.filter((_, i) => i !== index));
+  };
+
+  const handleAddChapter = () => {
+    setChapters([
+      ...chapters,
+      {
+        title: `Chapter ${chapters.length + 1}`,
+        description: "",
+      },
+    ]);
+  };
+
+  const handleFinalizeBook = async () => {
+    if (!bookTitle || chapters.length === 0) {
+      toast.error("Book title and atleast one chapter is required.");
+      return;
+    }
+    setIsFinalizingBook(true);
+
+    try {
+      const response = await axiosInstance.post(API_PATHS.BOOKS.CREATE_BOOK, {
+        title: bookTitle,
+        author: user.name || "Anonymous",
+        chapters: chapters,
+      });
+      onBookCreated(response.data.data._id);
+      onClose();
+      resetModal();
+      toast.success("Book created successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to finalize book. Please try again."
+      );
+    } finally {
+      setIsFinalizingBook(false);
+    }
+  };
+
+  useEffect(() => {
+    if (step == 2 && chaptersContainerRef.current) {
+      const scrollableDiv = chaptersContainerRef.current;
+      scrollableDiv.scrollTo({
+        top: scrollableDiv.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [chapters.length, step]);
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        onClose();
+        resetModal();
+      }}
+      title="Create a new book"
+    >
+      {step === 1 && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 text-violet-600 text-sm font-semibold">
+              1
+            </div>
+            <div className="flex-1 h-0.5 bg-violet-500"></div>
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-400 text-sm font-semibold">
+              2
+            </div>
+          </div>
+
+          <InputField
+            icon={BookOpen}
+            label="Book Title"
+            placeholder="Enter book title"
+            value={bookTitle}
+            onChange={(e) => setBookTitle(e.target.value)}
+          />
+
+          <InputField
+            icon={Hash}
+            label="Number of chapters"
+            type="number"
+            placeholder="5"
+            value={numChapters}
+            onChange={(e) => setNumChapters(parseInt(e.target.value) || 1)}
+            min="1"
+            max="20"
+          />
+
+          <InputField
+            icon={Lightbulb}
+            label="Topic(optional)"
+            placeholder="Specific topic for AI generation"
+            value={aiTopic}
+            onChange={(e) => setAiTopic(e.target.value)}
+          />
+
+          <SelectField
+            icon={Palette}
+            label="Writing Style"
+            value={aiStyle}
+            onChange={(e) => setAiStyle(e.target.value)}
+            options={[
+              "Informative",
+              "Creative",
+              "Storytelling",
+              "Casual",
+              "Professional",
+              "Humorous",
+            ]}
+          />
+          <div className="flex justify-end pt-4">
+            <Button
+              onClick={handleGenerateOutline}
+              isLoading={isGeneratingOutline}
+              icon={Sparkles}
+            >
+              Generate Outline with AI
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="space-y-5">
+          {/* Progress indicator */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 text-violet-600 text-sm font-semibold">
+              ✔
+            </div>
+            <div className="flex-1 h-0.5 bg-violet-500"></div>
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-violet-600 text-sm font-semibold">
+              2
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Review Chapters
+            </h3>
+            <span className="text-sm text-gray-500">
+              {chapters.length} chapters
+            </span>
+          </div>
+
+          <div
+            ref={chaptersContainerRef}
+            className="space-y-3 max-h-96 overflow-y-auto pr-1"
+          >
+            {chapters.length === 0 ? (
+              <div className="text-center py-12 px-4 bg-gray-50 rounded-xl">
+                <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">
+                  No chapters yet. Add one to get started
+                </p>
+              </div>
+            ) : (
+              chapters.map((chapter, index) => (
+                <div
+                  className="group p-4 border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all bg-white"
+                  key={index}
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-50 text-violet-600 text-sm font-semibold">
+                      {index + 1}
+                    </div>
+                    <input
+                      type="text"
+                      value={chapter.title}
+                      onChange={(e) =>
+                        handleChapterChange(index, "title", e.target.value)
+                      }
+                      placeholder="Chapter title"
+                      className="flex-1 text-base font-medium text-gray-900 bg-transparent border-none focus:ouline-none focus:ring-0 placeholder:text-gray-400 placeholder:text-sm placeholder:font-medium placeholder:tracking-wide"
+                    />
+                    <button
+                      onClick={() => handleDeleteChapter(index)}
+                      className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                      title="Delete chapter"
+                    >
+                      <Trash2 className="w-h h-4 text-red-500" />
+                    </button>
+                  </div>
+
+                  <textarea
+                    placeholder="Chapter description"
+                    value={chapter.description}
+                    onChange={(e) =>
+                      handleChapterChange(index, "description", e.target.value)
+                    }
+                    rows={2}
+                    className="w-full pl-9 text-sm text-gray-500 bg-transparent border-none focus:ouline-none focus:ring-0 placeholder:text-gray-400 resize-none"
+                  ></textarea>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 gap-2">
+            <Button variant="ghost" onClick={() => setStep(1)} icon={ArrowLeft}>
+              Back
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={handleAddChapter}
+                icon={Plus}
+              >
+                Add Chapter
+              </Button>
+              <Button onClick={handleFinalizeBook} isLoading={isFinalizingBook}>
+                Create eBook
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
 };
 
 export default CreateBookModal;

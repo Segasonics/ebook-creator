@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPath";
 import BookCard from "../components/cards/BookCard";
+import CreateBookModal from "../components/modals/CreateBookModal";
 
 const BookCardSkeleton = () => (
   <div className="animate-pulse bg-white border border-slate-200 rounded-lg shadow-sm">
@@ -159,6 +160,12 @@ const DashboardPage = () => {
           onConfirm={handleDeleteBook}
           title="Delete Book"
           message="Are you sure you want to delete this book?"
+        />
+
+        <CreateBookModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onBookCreated={handleBookCreated}
         />
       </div>
     </DashboardLayout>
