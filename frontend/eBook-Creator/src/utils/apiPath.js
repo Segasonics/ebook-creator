@@ -7,7 +7,7 @@ export const API_PATHS = {
   BOOKS: {
     CREATE_BOOK: "/book",
     GET_BOOKS: "/book",
-    GET_BOOK_BY_ID: "/book/:id",
+    GET_BOOK_BY_ID: "/book",
     UPDATE_BOOK: "/book",
     DELETE_BOOK: "/book",
     UPDATE_BOOK_COVER: "/book/:id/cover",
