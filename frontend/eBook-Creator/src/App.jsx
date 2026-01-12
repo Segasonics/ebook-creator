@@ -36,7 +36,7 @@ const App = () => {
           }
         />
         <Route
-          path="/viewbook/:bookId"
+          path="/view-book/:bookId"
           element={
             <ProtectedRoute>
               <ViewbookPage />

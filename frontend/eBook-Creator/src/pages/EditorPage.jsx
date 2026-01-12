@@ -37,8 +37,6 @@ const EditorPage = () => {
   const fileInputRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  console.log(book);
-
   //AI modal state
   const [isOutlineModalOpen, setIsOutlineModalOpen] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
@@ -69,25 +67,194 @@ const EditorPage = () => {
     }));
   };
 
-  const handleChapterChage = (e) => {};
+  const handleChapterChage = (e) => {
+    const { name, value } = e.target;
 
-  const handleAddChapter = () => {};
+    const updatedChapters = [...book.chapters];
+    updatedChapters[selectedChapterIndex][name] = value;
+    setBook((prevBook) => ({
+      ...prevBook,
+      chapters: updatedChapters,
+    }));
+  };
 
-  const handleDeleteChapter = (index) => {};
+  const handleAddChapter = () => {
+    const newChapter = {
+      title: `Chapter ${book.chapters.length + 1}`,
+      content: "",
+    };
 
-  const handleReorderChapters = (oldIndex, newIndex) => {};
+    const updatedChapters = [...book.chapters, newChapter];
+    setBook((prevBook) => ({
+      ...prevBook,
+      chapters: updatedChapters,
+    }));
+    setSelectedChapterIndex(updatedChapters.length - 1);
+  };
 
-  const handleSaveChanges = async (bookToSave = book, showToast = true) => {};
+  const handleDeleteChapter = (index) => {
+    if (book.chapters.length <= 1) {
+      toast.error("Atleast one chapter is required");
+      return;
+    }
 
-  const handleCoverImageUpload = async (e) => {};
+    const updatedChapters = book.chapters.filter((_, i) => i !== index);
 
-  const handleGenerateOutline = async () => {};
+    setBook((prevBook) => ({
+      ...prevBook,
+      chapters: updatedChapters,
+    }));
 
-  const handleGenerateChapterContent = async (index) => {};
+    setSelectedChapterIndex((prevIndex) =>
+      prevIndex >= index ? Math.max(0, prevIndex - 1) : prevIndex
+    );
+  };
 
-  const hadleExportPDF = async () => {};
+  const handleReorderChapters = (oldIndex, newIndex) => {
+    setBook((prevBook) => ({
+      ...prevBook,
+      chapters: arrayMove(prevBook.chapters, oldIndex, newIndex),
+    }));
+    setSelectedChapterIndex(newIndex); //keep selected chapter consistent after reorder
+  };
 
-  const handleExportDoc = async () => {};
+  const handleSaveChanges = async (bookToSave = book, showToast = true) => {
+    setIsSaving(true);
+    try {
+      await axiosInstance.put(
+        `${API_PATHS.BOOKS.UPDATE_BOOK}/${bookToSave._id}`,
+        bookToSave
+      );
+      if (showToast) {
+        toast.success("Changes saved successfully!");
+      }
+      setIsSaving(false);
+    } catch (error) {
+      console.log("error", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to save changes. Please try again."
+      );
+      setIsSaving(false);
+    }
+  };
+
+  const handleCoverImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    console.log(file);
+    const formData = new FormData();
+    formData.append("coverImage", file);
+
+    setIsUploading(true);
+    try {
+      console.log(formData);
+      const response = await axiosInstance.put(
+        `${API_PATHS.BOOKS.UPDATE_BOOK_COVER}/${book._id}/cover`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setBook(response.data.data);
+      toast.success("Cover image uploaded successfully!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to upload cover image. Please try again."
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleGenerateChapterContent = async (index) => {
+    const chapter = book.chapters[index];
+    if (!chapter || !chapter.title) {
+      toast.error("Please enter a title for the chapter.");
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const response = await axiosInstance.post(
+        API_PATHS.AI.GENERATE_CHAPTER_CONTENT,
+        {
+          chapterTitle: chapter.title,
+          chapterDescription: chapter.description || "",
+          style: aiStyle,
+        }
+      );
+      const updatedChapters = [...book.chapters];
+      console.log(updatedChapters);
+      updatedChapters[index].content = response.data.data;
+      console.log(response.data.data);
+
+      const updatedBook = { ...book, chapters: updatedChapters };
+      setBook(updatedBook);
+      toast.success("Chapter content generated successfully!");
+      await handleSaveChanges(updatedBook, false);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to generate chapter content. Please try again."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const hadleExportPDF = async () => {
+    toast.loading("Generating PDF...");
+    try {
+      const response = await axiosInstance.get(
+        `${API_PATHS.EXPORT.PDF}/${bookId}/pdf`,
+        {
+          responseType: "blob",
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${book.title}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.dismiss();
+      toast.success("PDF generated successfully!");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to generate PDF. Please try again.");
+    }
+  };
+
+  const handleExportDoc = async () => {
+    toast.loading("Generating Document...");
+    try {
+      const response = await axiosInstance.get(
+        `${API_PATHS.EXPORT.PDF}/${bookId}/doc`,
+        {
+          responseType: "blob",
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${book.title}.docx`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.dismiss();
+      toast.success("Document generated successfully!");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to generate Document. Please try again.");
+    }
+  };
 
   if (isLoading || !book) {
     return (

@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { FileFilterCallback } from "multer";
 
-const uploadDir = "uploads";
+const uploadDir = "src/uploads";
 
 //create upload directory if not exist
 if (!fs.existsSync(uploadDir)) {
