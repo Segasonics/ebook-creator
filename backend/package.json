@@ -15,11 +15,11 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.4",
+    "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/markdown-it": "^14.1.2",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.10.8",
     "@types/pdfkit": "^0.17.3",
     "ts-node": "^10.9.2",
     "typecript": "^0.0.1-security"
