@@ -31,6 +31,26 @@ app.use("/backend/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/v1", rootRoute);
 
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    express.static(
+      path.join(__dirname, "..", "frontend", "eBook-Creator", "dist")
+    )
+  );
+  app.get("*", (req: Request, res: Response) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "..",
+        "frontend",
+        "eBook-Creator",
+        "dist",
+        "index.html"
+      )
+    );
+  });
+}
+
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   res.status(error.statusCode || 500).json({
     success: false,
