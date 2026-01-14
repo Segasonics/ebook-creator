@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 import { Request, Response } from "express";
+import { uploadOnCloudinary } from "../utils/cloudinary";
 
 export const createBook = asyncHandler(async (req: Request, res: Response) => {
   const { title, author, subtitle, chapters } = req.body;
@@ -95,14 +96,25 @@ export const updateBookCover = asyncHandler(
       throw new ApiError(401, "Unauthorized");
     }
 
-    if (req.file) {
-      book.coverImage = `/${req.file.path}`;
-      await book.save();
-      res
-        .status(200)
-        .json(
-          new ApiResponse(200, "Book cover image updated successfully", book)
-        );
+    if (!req.file) {
+      throw new ApiError(400, "Book cover image is required");
     }
+    console.log("file", req.file);
+    const imagePath = req.file.path.replace(/\\/g, "/");
+
+    const image = await uploadOnCloudinary(imagePath);
+
+    console.log("image", image);
+    if (!image?.url) {
+      throw new ApiError(400, "Book cover image is required");
+    }
+
+    book.coverImage = image?.url;
+    await book.save();
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, "Book cover image updated successfully", book)
+      );
   }
 );

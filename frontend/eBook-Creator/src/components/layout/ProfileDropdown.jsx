@@ -11,6 +11,7 @@ const ProfileDropdown = ({
   isOpen,
 }) => {
   const navigate = useNavigate();
+  console.log(companyName);
   return (
     <div className="relative">
       <button onClick={onToggle} className="flex items-center rounded-xl">
@@ -46,13 +47,13 @@ const ProfileDropdown = ({
             <p className="text-xs text-gray-600">{email}</p>
           </div>
           <button
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left cursor-pointer"
             onClick={() => navigate("/profile")}
           >
             View Profile
           </button>
           <button
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left cursor-pointer"
             onClick={onLogout}
           >
             Logout

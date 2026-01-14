@@ -20,6 +20,9 @@ export const API_PATHS = {
     PDF: "/export",
     DOC: "/export",
   },
+  CHAT: {
+    AI: "/chat/ai",
+  },
 };
 
 export const BASE_URL = "http://localhost:8000";

@@ -3,6 +3,7 @@ import authRoute from "./authRoute";
 import aiRoute from "./aiRoute";
 import bookRoute from "./bookRoute";
 import exportRoute from "./exportRoute";
+import chatRoute from "./chatRoute";
 
 const rootRoute = express.Router();
 
@@ -10,5 +11,6 @@ rootRoute.use("/auth", authRoute);
 rootRoute.use("/ai", aiRoute);
 rootRoute.use("/book", bookRoute);
 rootRoute.use("/export", exportRoute);
+rootRoute.use("/chat", chatRoute);
 
 export default rootRoute;

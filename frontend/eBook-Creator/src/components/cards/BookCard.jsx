@@ -6,9 +6,7 @@ import { Edit, Trash } from "lucide-react";
 const BookCard = ({ book, onDelete }) => {
   const navigate = useNavigate();
 
-  const coverImageUrl = book.coverImage
-    ? `${BASE_URL}/backend${book.coverImage}`.replace(/\\/g, "/")
-    : "";
+  const coverImageUrl = book.coverImage;
 
   return (
     <div
