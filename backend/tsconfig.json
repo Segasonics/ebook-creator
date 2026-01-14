@@ -4,14 +4,13 @@
     // File Layout
      "rootDir": "./src",
      "outDir": "dist",
-        "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["node"],
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "target": "es2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "esnext",
+    "types": [],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -42,7 +41,6 @@
     // "moduleDetection": "force",
    "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop":true,
-  },
-  "include": ["src"]
+    "esModuleInterop":true
+  }
 }
