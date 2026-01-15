@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
   generateChapterContent,
   generateOutline,
-} from "../controllers/aiController";
-import { authMiddleware } from "../middlewares/authMiddleware";
+} from "../controllers/aiController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router: Router = Router();
 

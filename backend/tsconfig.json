@@ -7,10 +7,10 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "esnext",
-    "types": [],
+    "module": "es2020",
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

@@ -1,9 +1,9 @@
 import express from "express";
-import authRoute from "./authRoute";
-import aiRoute from "./aiRoute";
-import bookRoute from "./bookRoute";
-import exportRoute from "./exportRoute";
-import chatRoute from "./chatRoute";
+import authRoute from "./authRoute.js";
+import aiRoute from "./aiRoute.js";
+import bookRoute from "./bookRoute.js";
+import exportRoute from "./exportRoute.js";
+import chatRoute from "./chatRoute.js";
 
 const rootRoute = express.Router();
 

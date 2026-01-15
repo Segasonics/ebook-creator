@@ -1,9 +1,9 @@
-import Book from "../models/Book";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import Book from "../models/Book.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { Request, Response } from "express";
-import { uploadOnCloudinary } from "../utils/cloudinary";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 export const createBook = asyncHandler(async (req: Request, res: Response) => {
   const { title, author, subtitle, chapters } = req.body;

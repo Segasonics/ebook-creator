@@ -6,9 +6,9 @@ import {
   getBooks,
   updateBook,
   updateBookCover,
-} from "../controllers/bookController";
-import { authMiddleware } from "../middlewares/authMiddleware";
-import { upload } from "../middlewares/uploadMiddleware";
+} from "../controllers/bookController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router: Router = Router();
 

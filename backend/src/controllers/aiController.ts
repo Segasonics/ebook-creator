@@ -1,5 +1,5 @@
-import { ApiError } from "../utils/ApiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Response, Request } from "express";
 import { ChatOpenAI } from "@langchain/openai";
@@ -8,7 +8,7 @@ import {
   StringOutputParser,
 } from "@langchain/core/output_parsers";
 import { RunnableSequence } from "@langchain/core/runnables";
-import { ApiResponse } from "../utils/ApiResponse";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const generateOutline = asyncHandler(
   async (req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/User.js";
 
 export const authMiddleware = async (
   req: Request,

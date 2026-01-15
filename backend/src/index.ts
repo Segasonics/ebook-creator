@@ -3,15 +3,17 @@ import { Response, Request } from "express";
 import { config } from "dotenv";
 import cors from "cors";
 import path from "path";
-import { connectDB } from "./config/db";
-import rootRoute from "./routes/index";
+import { connectDB } from "./config/db.js";
+import rootRoute from "./routes/index.js";
 import cookieParser from "cookie-parser";
+import { fileURLToPath } from "url";
 
 config();
 
 const app = express();
 
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(
   cors({

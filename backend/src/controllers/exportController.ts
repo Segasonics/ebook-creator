@@ -12,12 +12,12 @@ import {
 } from "docx";
 import PDFDocument, { formText, lineGap } from "pdfkit";
 import MarkdownIt from "markdown-it";
-import Book from "../models/Book";
+import Book from "../models/Book.js";
 import path from "path";
 import fs from "fs";
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { FormattingState, InlineChild } from "../types/textRun";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 
 const md = new MarkdownIt();
 
