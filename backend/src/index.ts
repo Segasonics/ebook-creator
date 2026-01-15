@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === "production") {
       path.join(__dirname, "..", "frontend", "eBook-Creator", "dist")
     )
   );
-  app.get("*", (req: Request, res: Response) => {
+  app.get("/*", (req: Request, res: Response) => {
     res.sendFile(
       path.join(
         __dirname,
