@@ -29,9 +29,9 @@ const DashboardLayout = ({ children }) => {
               <div className="h-8 w-8 bg-linear-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
                 <Album className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
-              <Link className="text-black font-bold text-xl" to={"/"}>
-                BookForge
-              </Link>
+            </Link>
+            <Link className="text-black font-bold text-xl" to="/">
+              BookForge
             </Link>
           </div>
 

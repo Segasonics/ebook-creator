@@ -1,10 +1,18 @@
 import axios from "axios";
 
+const resolveBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  const host = typeof window !== "undefined" ? window.location.hostname : "";
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "http://localhost:8000/api/v1";
+  }
+  return "https://ebook-creator-oxx7.onrender.com/api/v1";
+};
+
 const axiosInstance = axios.create({
-  baseURL:
-    import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api/v1"
-      : "https://ebook-creator-oxx7.onrender.com/api/v1",
+  baseURL: resolveBaseUrl(),
   timeout: 80000,
   headers: {
     "Content-Type": "application/json",
