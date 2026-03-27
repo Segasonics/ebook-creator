@@ -1,4 +1,4 @@
-import { IUser } from "../types/user";
+import { IUser } from "../types/user.js";
 import { Document } from "mongoose";
 
 type UserDoc = Document & IUser;

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { IUser, IUserMethods } from "../types/user";
+import { IUser, IUserMethods } from "../types/user.js";
 
 // “This Mongoose model works with documents shaped like IUser,
 // and those documents also have extra methods defined in IUserMethods.”
@@ -54,7 +54,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (password: string) {
-  return await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password as string);
 };
 
 userSchema.methods.generateToken = function (id: string) {

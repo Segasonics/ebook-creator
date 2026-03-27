@@ -15,11 +15,56 @@ import MarkdownIt from "markdown-it";
 import Book from "../models/Book.js";
 import path from "path";
 import fs from "fs";
+import axios from "axios";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { FormattingState, InlineChild } from "../types/textRun";
+import type { FormattingState, InlineChild } from "../types/textRun.js";
+import type { IChapter } from "../types/book.js";
 import { ApiError } from "../utils/ApiError.js";
 
 const md = new MarkdownIt();
+
+type DocxImageType = "png" | "jpg" | "gif" | "bmp";
+
+const isRemoteUrl = (value: string) => /^https?:\/\//i.test(value);
+
+const getImageType = (
+  source: string | undefined,
+  contentType: string | undefined
+): DocxImageType => {
+  const fromContentType = (contentType || "").toLowerCase();
+  if (fromContentType.includes("png")) return "png";
+  if (fromContentType.includes("jpg") || fromContentType.includes("jpeg"))
+    return "jpg";
+  if (source) {
+    const ext = path.extname(source).toLowerCase();
+    if (ext === ".png") return "png";
+    if (ext === ".jpg" || ext === ".jpeg") return "jpg";
+  }
+  return "jpg";
+};
+
+const fetchImageBuffer = async (
+  source: string
+): Promise<{ buffer: Buffer; type: DocxImageType } | null> => {
+  if (isRemoteUrl(source)) {
+    const response = await axios.get<ArrayBuffer>(source, {
+      responseType: "arraybuffer",
+    });
+    return {
+      buffer: Buffer.from(response.data),
+      type: getImageType(source, response.headers?.["content-type"]),
+    };
+  }
+
+  const normalizedPath = source.startsWith("/") ? source.slice(1) : source;
+  if (!fs.existsSync(normalizedPath)) {
+    return null;
+  }
+  return {
+    buffer: fs.readFileSync(normalizedPath),
+    type: getImageType(normalizedPath, undefined),
+  };
+};
 
 const DOCX_STYLES = {
   fonts: {
@@ -333,14 +378,11 @@ export const exportAsDocument = asyncHandler(
     //Cover page with image if available
     const coverPage = [];
 
-    if (book.coverImage && book.coverImage.includes("pravatar")) {
-      //to remove the first /, making it relative to the current directory.
-      const imagePath = book.coverImage.substring(1);
-
+    if (book.coverImage && !book.coverImage.includes("pravatar")) {
       try {
-        if (fs.existsSync(imagePath)) {
-          const imageBuffer = fs.readFileSync(imagePath);
+        const imageData = await fetchImageBuffer(book.coverImage);
 
+        if (imageData && imageData.buffer) {
           //Add some top spacing
           coverPage.push(
             new Paragraph({
@@ -354,9 +396,9 @@ export const exportAsDocument = asyncHandler(
             new Paragraph({
               children: [
                 new ImageRun({
-                  data: imageBuffer,
+                  data: imageData.buffer,
                   transformation: { width: 500, height: 500 },
-                  type: imagePath.endsWith(".png") ? "png" : "jpg",
+                  type: imageData.type as "png" | "jpg" | "gif" | "bmp",
                 }),
               ],
               alignment: AlignmentType.CENTER,
@@ -372,7 +414,7 @@ export const exportAsDocument = asyncHandler(
           );
         }
       } catch (imgErr) {
-        console.log(`Could not embed image ${imagePath}: ${imgErr}`);
+        console.log(`Could not embed image ${book.coverImage}: ${imgErr}`);
       }
     }
 
@@ -453,7 +495,7 @@ export const exportAsDocument = asyncHandler(
     sections.push(...titlePage);
 
     //Process Chapters
-    book.chapters.forEach((chapter, index) => {
+    book.chapters.forEach((chapter: IChapter, index: number) => {
       try {
         if (index > 0) {
           sections.push(
@@ -818,16 +860,15 @@ export const exportAsPdf = asyncHandler(async (req: Request, res: Response) => {
 
   //Cover page with image if available
   if (book.coverImage && !book.coverImage.includes("pravatar")) {
-    const imagePath = book.coverImage.substring(1);
-
     try {
-      if (fs.existsSync(imagePath)) {
+      const imageData = await fetchImageBuffer(book.coverImage);
+      if (imageData && imageData.buffer) {
         const pageWidth =
           doc.page.width - doc.page.margins.left - doc.page.margins.right;
         const pageHeight =
           doc.page.height - doc.page.margins.top - doc.page.margins.bottom;
 
-        doc.image(imagePath, doc.page.margins.left, doc.page.margins.top, {
+        doc.image(imageData.buffer, doc.page.margins.left, doc.page.margins.top, {
           fit: [pageWidth * 0.8, pageHeight * 0.8],
           align: "center",
           valign: "center",
@@ -835,7 +876,7 @@ export const exportAsPdf = asyncHandler(async (req: Request, res: Response) => {
         doc.addPage();
       }
     } catch (imgErr) {
-      console.log(`Could not embed image:${imagePath}`, imgErr);
+      console.log(`Could not embed image:${book.coverImage}`, imgErr);
     }
   }
 
@@ -872,7 +913,7 @@ export const exportAsPdf = asyncHandler(async (req: Request, res: Response) => {
 
   //Process chapters
   if (book.chapters && book.chapters.length > 0) {
-    book.chapters.forEach((chapter, index) => {
+    book.chapters.forEach((chapter: IChapter, index: number) => {
       try {
         doc.addPage();
         //chapter title

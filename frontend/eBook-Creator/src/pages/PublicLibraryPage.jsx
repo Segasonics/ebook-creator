@@ -9,6 +9,13 @@ import { BookOpen } from "lucide-react";
 const PublicLibraryPage = () => {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
+
+  const totalPages = Math.max(1, Math.ceil(books.length / pageSize));
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, books.length);
+  const pagedBooks = books.slice(startIndex, endIndex);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -24,6 +31,12 @@ const PublicLibraryPage = () => {
     };
     fetchBooks();
   }, []);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(1);
+    }
+  }, [page, totalPages]);
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -74,11 +87,48 @@ const PublicLibraryPage = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {books.map((book) => (
-                <PublicBookCard key={book._id} book={book} />
-              ))}
-            </div>
+            <>
+              <div className="space-y-4">
+                {pagedBooks.map((book) => (
+                  <PublicBookCard key={book._id} book={book} />
+                ))}
+              </div>
+
+              {books.length > pageSize && (
+                <div className="mt-8 flex flex-col gap-3 items-center justify-between rounded-2xl border border-slate-200/70 bg-white px-4 py-3 sm:flex-row">
+                  <p className="text-sm text-slate-500">
+                    Showing <span className="font-semibold text-slate-700">{startIndex + 1}</span>
+                    {" "}to{" "}
+                    <span className="font-semibold text-slate-700">{endIndex}</span>
+                    {" "}of{" "}
+                    <span className="font-semibold text-slate-700">{books.length}</span>
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                      disabled={page === 1}
+                      className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Prev
+                    </button>
+                    <div className="text-sm text-slate-500">
+                      Page <span className="font-semibold text-slate-700">{page}</span> of{" "}
+                      <span className="font-semibold text-slate-700">{totalPages}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                      disabled={page === totalPages}
+                      className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>

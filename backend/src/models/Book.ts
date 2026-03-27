@@ -1,4 +1,4 @@
-import { IChapter, IBook } from "../types/book";
+import { IChapter, IBook } from "../types/book.js";
 import mongoose, { Schema } from "mongoose";
 
 const chapterSchema = new Schema<IChapter>({

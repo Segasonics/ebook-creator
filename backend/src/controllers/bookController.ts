@@ -1,4 +1,5 @@
 import Book from "../models/Book.js";
+import { IChapter } from "../types/book.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -163,7 +164,7 @@ export const generateBookDescription = asyncHandler(
 
     const chapterTitles = (book.chapters || [])
       .slice(0, 8)
-      .map((ch) => ch.title)
+      .map((ch: IChapter) => ch.title)
       .join(", ");
 
     const promptTemplate = new PromptTemplate({
