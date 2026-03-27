@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Book, Menu, LogOut, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,6 +10,8 @@ const Navbar = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const onHome = location.pathname === "/";
 
   //close dropdowns when clicking outside
   useEffect(() => {
@@ -39,24 +41,43 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-slate-300 hover:text-white transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#templates"
-              className="text-slate-300 hover:text-white transition-colors"
-            >
-              Testimonials
-            </a>
-            <a
-              href="#pricing"
-              className="text-slate-300 hover:text-white transition-colors"
-            >
-              Pricing
-            </a>
+            {onHome ? (
+              <>
+                <a
+                  href="#features"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Features
+                </a>
+                <a
+                  href="#testimonials"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Testimonials
+                </a>
+                <a
+                  href="#pricing"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Pricing
+                </a>
+              </>
+            ) : (
+              <Link
+                to="/"
+                className="text-slate-300 hover:text-white transition-colors"
+              >
+                Home
+              </Link>
+            )}
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                className="text-slate-200 hover:text-white transition-colors"
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
 
           {isAuthenticated ? (
@@ -104,24 +125,43 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden pt-6 pb-4 space-y-4 border-t border-slate-800 mt-4">
-            <a
-              href="#features"
-              className="block text-slate-300 hover:text-white transition-colors py-2"
-            >
-              Features
-            </a>
-            <a
-              href="#templates"
-              className="block text-slate-300 hover:text-white transition-colors py-2"
-            >
-              Testimonials
-            </a>
-            <a
-              href="#pricing"
-              className="block text-slate-300 hover:text-white transition-colors py-2"
-            >
-              Pricing
-            </a>
+            {onHome ? (
+              <>
+                <a
+                  href="#features"
+                  className="block text-slate-300 hover:text-white transition-colors py-2"
+                >
+                  Features
+                </a>
+                <a
+                  href="#testimonials"
+                  className="block text-slate-300 hover:text-white transition-colors py-2"
+                >
+                  Testimonials
+                </a>
+                <a
+                  href="#pricing"
+                  className="block text-slate-300 hover:text-white transition-colors py-2"
+                >
+                  Pricing
+                </a>
+              </>
+            ) : (
+              <Link
+                to="/"
+                className="block text-slate-300 hover:text-white transition-colors py-2"
+              >
+                Home
+              </Link>
+            )}
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                className="block text-slate-300 hover:text-white transition-colors py-2"
+              >
+                Dashboard
+              </Link>
+            )}
             <hr className="border-slate-800" />
             {isAuthenticated ? (
               <>

@@ -23,7 +23,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-50">
       <div className="flex flex-col flex-1 w-full">
-        <header className="bg-white/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between h-16 border-gray-200">
+        <header className="relative z-40 bg-white/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between h-16 border-gray-200">
           <div className="flex items-center space-x-4">
             <Link className="flex items-center space-x-3" to="/dashboard">
               <div className="h-8 w-8 bg-linear-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
@@ -42,10 +42,11 @@ const DashboardLayout = ({ children }) => {
                 setProfileDropdown(!profileDropdown);
               }}
               avatar={user?.avatar}
-              companyName={user?.companyName}
+              companyName={user?.name || user?.companyName}
               email={user?.email}
               onLogout={logout}
               isOpen={profileDropdown}
+              theme="light"
             />
           </div>
         </header>

@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from "express";
 import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { ensureMonthlyCredits } from "../utils/credits.js";
 
 export const authMiddleware = async (
   req: Request,
@@ -20,6 +21,7 @@ export const authMiddleware = async (
     if (!user) {
       throw new ApiError(401, "Invalid token");
     }
+    await ensureMonthlyCredits(user);
     req.user = user;
     next();
   } catch (error) {

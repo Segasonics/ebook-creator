@@ -7,6 +7,9 @@ import EditorPage from "./pages/EditorPage.jsx";
 import ViewbookPage from "./pages/ViewbookPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
+import PublicLibraryPage from "./pages/PublicLibraryPage.jsx";
+import PublicBookPage from "./pages/PublicBookPage.jsx";
+import BillingPage from "./pages/BillingPage.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import ChatBox from "./components/chatbox/ChatBox.jsx";
 
@@ -16,6 +19,8 @@ const App = () => {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/library" element={<PublicLibraryPage />} />
+        <Route path="/library/:bookId" element={<PublicBookPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         {/* Protected routes */}
@@ -48,6 +53,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/billing"
+          element={
+            <ProtectedRoute>
+              <BillingPage />
             </ProtectedRoute>
           }
         />

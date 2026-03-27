@@ -18,7 +18,12 @@ import { API_PATHS } from "../../utils/apiPath";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
-const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
+const CreateBookModal = ({
+  isOpen,
+  onClose,
+  onBookCreated,
+  isLimitReached = false,
+}) => {
   const { user } = useAuth();
 
   const [step, setStep] = useState(1);
@@ -90,6 +95,12 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
   };
 
   const handleFinalizeBook = async () => {
+    if (isLimitReached && !user?.isPro) {
+      toast.error(
+        "Free plan credits exhausted. Credits reset monthly. Upgrade to Pro for unlimited books."
+      );
+      return;
+    }
     if (!bookTitle || chapters.length === 0) {
       toast.error("Book title and atleast one chapter is required.");
       return;
@@ -287,9 +298,16 @@ const CreateBookModal = ({ isOpen, onClose, onBookCreated }) => {
               >
                 Add Chapter
               </Button>
-              <Button onClick={handleFinalizeBook} isLoading={isFinalizingBook}>
-                Create eBook
-              </Button>
+              <div className="flex flex-col items-end">
+                <Button onClick={handleFinalizeBook} isLoading={isFinalizingBook}>
+                  Create eBook
+                </Button>
+                {isLimitReached && !user?.isPro && (
+                  <span className="text-[11px] text-slate-500 mt-2">
+                    Free plan limit reached. Upgrade to Pro to create more.
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import {
   deleteBook,
   getBookById,
   getBooks,
+  generateBookDescription,
   updateBook,
   updateBookCover,
 } from "../controllers/bookController.js";
@@ -17,4 +18,5 @@ router.use(authMiddleware);
 router.route("/").get(getBooks).post(createBook);
 router.route("/:id").get(getBookById).put(updateBook).delete(deleteBook);
 router.route("/:id/cover").put(upload, updateBookCover);
+router.route("/:id/description").post(generateBookDescription);
 export default router;

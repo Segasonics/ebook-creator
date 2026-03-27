@@ -32,6 +32,14 @@ const userSchema = new Schema<IUser, IUserModel>(
       type: Boolean,
       default: false,
     },
+    credits: {
+      type: Number,
+      default: 5,
+    },
+    creditsResetAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

@@ -23,22 +23,28 @@ const Footer = () => {
               <h4 className="text-white font-semibold mb-4">Product</h4>
               <div className="space-y-3">
                 <a
-                  href="#"
+                  href="#features"
                   className="block text-slate-400 hover:text-white text-sm transition-colors"
                 >
                   Features
                 </a>
                 <a
-                  href="#"
+                  href="#testimonials"
                   className="block text-slate-400 hover:text-white text-sm transition-colors"
                 >
-                  Templates
+                  Testimonials
                 </a>
                 <a
-                  href="#"
+                  href="#pricing"
                   className="block text-slate-400 hover:text-white text-sm transition-colors"
                 >
                   Pricing
+                </a>
+                <a
+                  href="/library"
+                  className="block text-slate-400 hover:text-white text-sm transition-colors"
+                >
+                  Library
                 </a>
                 <a
                   href="#"
@@ -111,7 +117,7 @@ const Footer = () => {
           </div>
 
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
-            © 2025 BookForge. All rights reserved.
+            (c) 2025 BookForge. All rights reserved.
           </div>
         </div>
       </footer>

@@ -6,41 +6,81 @@ import { API_PATHS } from "../../utils/apiPath";
 export default function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { text: "Hi! How can I help you today?", sender: "bot" },
+    { id: "welcome", text: "Hi! How can I help you today?", sender: "bot" },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const messageRef = useRef(null);
+  const typingIntervalRef = useRef(null);
 
   useEffect(() => {
     messageRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const typeBotMessage = (fullText) => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+
+    const safeText = fullText ?? "";
+    const tokens = safeText.split(/(\s+)/).filter((t) => t !== "");
+    const messageId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const step = tokens.length > 400 ? 5 : 2;
+
+    setMessages((prev) => [...prev, { id: messageId, text: "", sender: "bot" }]);
+
+    let index = 0;
+    typingIntervalRef.current = setInterval(() => {
+      index = Math.min(tokens.length, index + step);
+      const nextText = tokens.slice(0, index).join("");
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId ? { ...msg, text: nextText } : msg
+        )
+      );
+
+      if (index >= tokens.length) {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
+      }
+    }, 30);
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     try {
       if (inputValue.trim()) {
-        const userMessage = { text: inputValue, sender: "user" };
+        const userMessage = {
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          text: inputValue.trim(),
+          sender: "user",
+        };
 
-        // 1️⃣ Immediately add user message
         setMessages((prev) => [...prev, userMessage]);
         setInputValue("");
         setLoading(true);
         const res = await axiosInstance.post(API_PATHS.CHAT.AI, {
-          message: inputValue,
+          message: userMessage.text,
         });
 
-        console.log("res", res);
-        const data = res.data.data[0].output;
-        console.log("data", data);
+        const data =
+          res?.data?.data?.[0]?.output ??
+          res?.data?.data?.output ??
+          res?.data?.data ??
+          "";
         setLoading(false);
-        const botMessage = { text: data, sender: "bot" };
-        setMessages((prev) => [...prev, botMessage]);
-        setInputValue("");
+        typeBotMessage(data);
       }
     } catch (error) {
       console.log(error);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -49,29 +89,29 @@ export default function ChatBox() {
   return (
     <>
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-120 bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200">
-          <div className="bg-linear-to-r from-blue-600 to-blue-700 rounded-t-2xl p-4 flex items-center justify-between">
+        <div className="fixed bottom-24 right-6 w-96 h-120 bg-white/90 rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-200/80 backdrop-blur">
+          <div className="bg-linear-to-r from-violet-600 to-fuchsia-600 rounded-t-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-blue-600" />
+                <MessageCircle className="w-6 h-6 text-violet-600" />
               </div>
               <div>
                 <h3 className="text-white font-semibold">Chat Support</h3>
-                <p className="text-blue-100 text-sm">Online</p>
+                <p className="text-violet-100 text-sm">Online</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-blue-800 rounded-full p-1 transition-colors"
+              className="text-white hover:bg-white/15 rounded-full p-1 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/60">
             {messages.map((message, index) => (
               <div
-                key={index}
+                key={message.id || index}
                 className={`flex ${
                   message.sender === "user" ? "justify-end" : "justify-start"
                 }`}
@@ -79,34 +119,31 @@ export default function ChatBox() {
                 <div
                   className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                     message.sender === "user"
-                      ? "bg-blue-600 text-white rounded-br-sm"
-                      : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
+                      ? "bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-br-sm"
+                      : "bg-white text-slate-800 rounded-bl-sm shadow-sm"
                   }`}
                 >
-                  {message.text}
+                  <span className="whitespace-pre-wrap">{message.text}</span>
                 </div>
               </div>
             ))}
 
             {loading && (
-              <div className="space-y-6">
-                {/* Style 1: Typing Dots */}
-                <div className="flex justify-start">
-                  <div className="bg-blue-600 px-4 py-3 rounded-2xl">
-                    <div className="flex gap-2">
-                      <div
-                        className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      ></div>
-                      <div
-                        className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      ></div>
-                      <div
-                        className="w-1 h-1 bg-slate-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      ></div>
-                    </div>
+              <div className="flex justify-start">
+                <div className="bg-white px-3 py-2 rounded-2xl shadow-sm">
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="w-1.5 h-1.5 bg-slate-400/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-slate-400/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-slate-400/80 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -124,11 +161,11 @@ export default function ChatBox() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent bg-white"
               />
               <button
                 type="submit"
-                className="bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-full p-2 hover:brightness-110 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!inputValue.trim()}
               >
                 <Send className="w-5 h-5" />
@@ -140,7 +177,7 @@ export default function ChatBox() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center z-50"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center z-50"
       >
         {isOpen ? (
           <X className="w-6 h-6" />

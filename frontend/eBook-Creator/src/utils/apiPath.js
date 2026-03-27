@@ -11,6 +11,7 @@ export const API_PATHS = {
     UPDATE_BOOK: "/book",
     DELETE_BOOK: "/book",
     UPDATE_BOOK_COVER: "/book",
+    GENERATE_DESCRIPTION: "/book",
   },
   AI: {
     GENERATE_OUTLINE: "/ai/generate-outline",
@@ -22,6 +23,10 @@ export const API_PATHS = {
   },
   CHAT: {
     AI: "/chat/ai",
+  },
+  PUBLIC: {
+    BOOKS: "/public/books",
+    RATE_BOOK: "/public/books",
   },
 };
 

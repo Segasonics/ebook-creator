@@ -3,14 +3,17 @@ import { Zap, Globe, Download, Book, Users, Lock } from "lucide-react";
 const Feature = () => {
   return (
     <>
-      <section id="features" className="py-8 px-6 lg:px-8 bg-slate-900/50">
+      <section id="features" className="py-20 px-6 lg:px-8 bg-slate-950">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-2">
-              Everything You Need
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">
+              How it works
+            </p>
+            <h2 className="text-4xl lg:text-5xl font-book font-semibold text-white mt-2">
+              Draft, structure, publish
             </h2>
-            <p className="text-xl text-slate-400">
-              Powerful tools to bring your stories to life
+            <p className="text-lg text-slate-400 mt-3">
+              Calm tools that guide you from outline to release.
             </p>
           </div>
 

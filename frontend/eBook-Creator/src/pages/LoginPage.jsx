@@ -30,6 +30,8 @@ export default function AuthPages() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       const response = await axiosInstance.post(
         isLogin ? API_PATHS.AUTH.LOGIN : API_PATHS.AUTH.REGISTER,
@@ -249,10 +251,25 @@ export default function AuthPages() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-linear-to-r cursor-pointer from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/40 transition-all flex items-center justify-center gap-2 group"
+              disabled={isLoading}
+              aria-busy={isLoading}
+              className={`w-full px-6 py-3 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 group ${
+                isLoading
+                  ? "opacity-70 cursor-not-allowed"
+                  : "cursor-pointer hover:shadow-lg hover:shadow-violet-500/40"
+              }`}
             >
-              {isLogin ? "Sign In" : "Create Account"}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {isLoading ? (
+                <>
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                  {isLogin ? "Signing in..." : "Creating account..."}
+                </>
+              ) : (
+                <>
+                  {isLogin ? "Sign In" : "Create Account"}
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
           </form>
 

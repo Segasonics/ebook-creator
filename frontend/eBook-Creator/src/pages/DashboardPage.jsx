@@ -12,11 +12,11 @@ import BookCard from "../components/cards/BookCard";
 import CreateBookModal from "../components/modals/CreateBookModal";
 
 const BookCardSkeleton = () => (
-  <div className="animate-pulse bg-white border border-slate-200 rounded-lg shadow-sm">
-    <div className="w-full aspect-16/25 bg-slate-200 rounded-t-lg"></div>
-    <div className="p-4">
-      <div className="h-6 w-3/4 bg-slate-200 mb-2"></div>
-      <div className="h-4 w-1/3 bg-slate-200 rounded"></div>
+  <div className="animate-pulse rounded-2xl border border-slate-200/70 bg-white overflow-hidden">
+    <div className="w-full h-44 sm:h-48 bg-slate-200"></div>
+    <div className="p-3">
+      <div className="h-4 w-3/4 bg-slate-200 mb-2 rounded"></div>
+      <div className="h-3 w-1/2 bg-slate-200 rounded"></div>
     </div>
   </div>
 );
@@ -94,7 +94,17 @@ const DashboardPage = () => {
     }
   };
 
+  const creditsLeft =
+    user?.isPro ? Number.POSITIVE_INFINITY : user?.credits ?? 0;
+  const isFreeLimitReached = !user?.isPro && creditsLeft <= 0;
+
   const handleCreateBookClick = () => {
+    if (isFreeLimitReached) {
+      toast.error(
+        "Free plan credits exhausted. Credits reset monthly. Upgrade to Pro for unlimited books."
+      );
+      return;
+    }
     setIsCreateModalOpen(true);
   };
 
@@ -104,56 +114,71 @@ const DashboardPage = () => {
   };
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 px-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">All eBooks</h1>
-            <p className="text-xs md:text-sm text-slate-600 mt-1">
-              Create,edit and manage all your AI-generated eBooks.
+      <div className="relative">
+        <div className="container mx-auto py-8 px-6 lg:px-12">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">
+                Your Library
+              </p>
+            <h1 className="text-3xl md:text-4xl font-book font-semibold text-slate-900 mt-2">
+              All eBooks
+            </h1>
+            <p className="text-sm text-slate-600 mt-2 max-w-xl">
+              Create, edit, and manage your AI-crafted books with a clean,
+              modern workspace designed for focus.
             </p>
           </div>
           <Button
-            className="whitespace-nowrap"
+            className={`whitespace-nowrap shadow-[0_10px_20px_-12px_rgba(79,70,229,0.6)] ${
+              isFreeLimitReached ? "opacity-60 cursor-not-allowed" : ""
+            }`}
             onClick={handleCreateBookClick}
             icon={Plus}
+            aria-disabled={isFreeLimitReached}
+            title={
+              isFreeLimitReached
+                ? "Free plan credits exhausted. Credits reset monthly."
+                : undefined
+            }
           >
             Create New
           </Button>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, index) => (
-              <BookCardSkeleton key={index} />
-            ))}
-          </div>
-        ) : books.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 justify-center py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">
-            <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
-              <Book className="w-8 h-8 text-gray-400" />
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {[...Array(8)].map((_, index) => (
+                <BookCardSkeleton key={index} />
+              ))}
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              No Ebooks Found
-            </h3>
-            <p className="text-sm text-slate-600 max-w-md">
-              You haven't created any eBooks yet. Get started by creating your
-              first one.
-            </p>
-            <Button onClick={handleCreateBookClick} icon={Plus}>
-              Create your first eBook
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-1">
-            {books?.map((book) => (
-              <BookCard
-                key={book._id}
-                book={book}
-                onDelete={() => setBookToDelete(book._id)}
-              />
-            ))}
-          </div>
-        )}
+          ) : books.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 justify-center py-14 text-center border border-slate-200/70 rounded-3xl bg-white/80 backdrop-blur-sm">
+              <div className="w-16 h-16 flex items-center justify-center bg-slate-100 rounded-full">
+                <Book className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                No eBooks yet
+              </h3>
+              <p className="text-sm text-slate-600 max-w-md">
+                Start your library by creating a new book. We will format and
+                organize everything for you.
+              </p>
+              <Button onClick={handleCreateBookClick} icon={Plus}>
+                Create your first eBook
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {books?.map((book) => (
+                <BookCard
+                  key={book._id}
+                  book={book}
+                  onDelete={() => setBookToDelete(book._id)}
+                />
+              ))}
+            </div>
+          )}
         <ConfirmationModal
           isOpen={!!bookToDelete}
           onClose={() => setBookToDelete(null)}
@@ -166,7 +191,9 @@ const DashboardPage = () => {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onBookCreated={handleBookCreated}
+          isLimitReached={isFreeLimitReached}
         />
+        </div>
       </div>
     </DashboardLayout>
   );

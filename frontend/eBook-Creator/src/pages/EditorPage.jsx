@@ -16,6 +16,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPath";
+import { useAuth } from "../context/AuthContext";
 import Dropdown, { DropdownItem } from "../components/ui/Dropdown";
 import InputField from "../components/ui/InputField";
 import Button from "../components/ui/Button";
@@ -28,9 +29,12 @@ import BookDetailsTab from "../components/editor/BookDetailsTab";
 const EditorPage = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [book, setBook] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("editor");
@@ -41,7 +45,7 @@ const EditorPage = () => {
   const [isOutlineModalOpen, setIsOutlineModalOpen] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
   const [aiStyle, setAiStyle] = useState("Informative");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(null);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -61,9 +65,11 @@ const EditorPage = () => {
 
   const handleBookChange = (e) => {
     const { name, value } = e.target;
+    const nextValue =
+      e.target.type === "checkbox" ? e.target.checked : value;
     setBook((prevBook) => ({
       ...prevBook,
-      [name]: value,
+      [name]: nextValue,
     }));
   };
 
@@ -139,6 +145,34 @@ const EditorPage = () => {
     }
   };
 
+  const handleTogglePublish = async () => {
+    if (!user?.isPro) {
+      toast.error("Publishing is available on Pro. Upgrade to publish.");
+      return;
+    }
+    const nextStatus = book.status === "published" ? "draft" : "published";
+    setIsPublishing(true);
+    try {
+      const response = await axiosInstance.put(
+        `${API_PATHS.BOOKS.UPDATE_BOOK}/${book._id}`,
+        { status: nextStatus }
+      );
+      setBook(response.data.data);
+      toast.success(
+        nextStatus === "published"
+          ? "Book published successfully!"
+          : "Book unpublished."
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update publish status. Please try again."
+      );
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   const handleCoverImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -171,13 +205,41 @@ const EditorPage = () => {
     }
   };
 
+  const handleGenerateDescription = async () => {
+    if (book.descriptionLocked) {
+      toast.error("Description is locked. Unlock it to regenerate with AI.");
+      return;
+    }
+    if (book.description) {
+      const confirmed = window.confirm(
+        "This will overwrite your current description. Continue?"
+      );
+      if (!confirmed) return;
+    }
+    setIsGeneratingDescription(true);
+    try {
+      const response = await axiosInstance.post(
+        `${API_PATHS.BOOKS.GENERATE_DESCRIPTION}/${book._id}/description`
+      );
+      setBook(response.data.data);
+      toast.success("Description generated!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to generate description. Please try again."
+      );
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
   const handleGenerateChapterContent = async (index) => {
     const chapter = book.chapters[index];
     if (!chapter || !chapter.title) {
       toast.error("Please enter a title for the chapter.");
       return;
     }
-    setIsGenerating(true);
+    setIsGenerating(index);
     try {
       const response = await axiosInstance.post(
         API_PATHS.AI.GENERATE_CHAPTER_CONTENT,
@@ -202,7 +264,7 @@ const EditorPage = () => {
           "Failed to generate chapter content. Please try again."
       );
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(null);
     }
   };
 
@@ -381,6 +443,26 @@ const EditorPage = () => {
               >
                 Save Changes
               </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleTogglePublish}
+                  isLoading={isPublishing}
+                  className={
+                    !user?.isPro ? "opacity-60 cursor-not-allowed" : ""
+                  }
+                  aria-disabled={!user?.isPro}
+                >
+                  {book.status === "published" ? "Unpublish" : "Publish"}
+                </Button>
+                {!user?.isPro && (
+                  <a
+                    href="/#pricing"
+                    className="text-xs text-slate-500 underline"
+                  >
+                    Pro only
+                  </a>
+                )}
+              </div>
             </div>
           </header>
 
@@ -398,7 +480,9 @@ const EditorPage = () => {
                 book={book}
                 onBookChange={handleBookChange}
                 onCoverUpload={handleCoverImageUpload}
+                onGenerateDescription={handleGenerateDescription}
                 isUploading={isUploading}
+                isGeneratingDescription={isGeneratingDescription}
                 fileInputRef={fileInputRef}
               />
             )}

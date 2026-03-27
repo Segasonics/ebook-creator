@@ -1,11 +1,27 @@
-import React, { useState } from "react";
-import { ChevronLeft, Menu } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronLeft, Menu, Maximize2, Minimize2 } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import ViewChapterSidebar from "./ViewChapterSidebar";
 
 const ViewBook = ({ book }) => {
   const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fontSize, setFontSize] = useState(18);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isPublic = location.pathname.startsWith("/library");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
 
   const selectedChapter = book.chapters[selectedChapterIndex];
 
@@ -29,14 +45,37 @@ const ViewBook = ({ book }) => {
       })
       .join("");
   };
+  const handleToggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement && containerRef.current) {
+        await containerRef.current.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error("Fullscreen not supported:", error);
+    }
+  };
+
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-white text-gray-900">
+    <div
+      ref={containerRef}
+      className={`flex ${
+        isFullscreen ? "h-screen" : "h-[calc(100vh-64px)]"
+      } bg-white text-gray-900`}
+    >
       <ViewChapterSidebar
         book={book}
         selectedChapterIndex={selectedChapterIndex}
         onSelectChapter={setSelectedChapterIndex}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        topOffsetClass={
+          isPublic && !isFullscreen ? "top-20 lg:top-0" : "top-0"
+        }
+        heightClass={
+          isPublic && !isFullscreen ? "h-[calc(100vh-80px)] lg:h-full" : "h-full"
+        }
       />
 
       {/* Main content */}
@@ -44,6 +83,13 @@ const ViewBook = ({ book }) => {
         {/* Header */}
         <header className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back
+            </button>
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -75,6 +121,17 @@ const ViewBook = ({ book }) => {
                 A+
               </button>
             </div>
+            <button
+              onClick={handleToggleFullscreen}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-4 h-4" />
+              ) : (
+                <Maximize2 className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </header>
         {/* Reading Area */}
@@ -97,7 +154,13 @@ const ViewBook = ({ book }) => {
               }}
             />
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-16 pt-18 border-t border-gray-200">
+            <div
+              className={`flex justify-between items-center mt-16 pt-18 border-t border-gray-200 ${
+                isPublic
+                  ? "sticky bottom-0 bg-white/95 backdrop-blur-sm py-4"
+                  : ""
+              }`}
+            >
               <button
                 onClick={() =>
                   setSelectedChapterIndex(Math.max(0, selectedChapterIndex - 1))
@@ -114,7 +177,7 @@ const ViewBook = ({ book }) => {
 
               <button
                 onClick={() =>
-                  selectedChapterIndex(
+                  setSelectedChapterIndex(
                     Math.min(book.chapters.length - 1, selectedChapterIndex + 1)
                   )
                 }

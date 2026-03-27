@@ -31,6 +31,14 @@ const bookSchema = new Schema<IBook>(
       type: String,
       default: "",
     },
+    description: {
+      type: String,
+      default: "",
+    },
+    descriptionLocked: {
+      type: Boolean,
+      default: false,
+    },
     author: {
       type: String,
       required: true,
@@ -44,6 +52,14 @@ const bookSchema = new Schema<IBook>(
       type: String,
       enum: ["draft", "published"],
       default: "draft",
+    },
+    ratingAverage: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
     },
   },
   {

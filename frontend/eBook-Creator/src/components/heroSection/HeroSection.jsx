@@ -1,138 +1,149 @@
 import React from "react";
-import { Sparkles, ArrowRight, Star, Book, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  BookOpen,
+  Wand2,
+  Layers3,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const { isAuthenticated } = useAuth();
-  return (
-    <>
-      <section className="pt-32 pb-22 px-6 lg:px-8 relative overflow-hidden">
-        {/* Background Decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-violet-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-3xl"></div>
-        </div>
+  const ctaLink = isAuthenticated ? "/dashboard" : "/login";
 
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 border border-violet-500/20 rounded-full">
-                <Sparkles className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-violet-300 font-medium">
-                  AI-Powered Creation
+  return (
+    <section className="min-h-screen pt-24 pb-10 px-6 lg:px-8 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_10%,rgba(139,92,246,0.25),transparent),radial-gradient(60%_50%_at_80%_20%,rgba(236,72,153,0.18),transparent)]"></div>
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute -top-24 right-0 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/15 rounded-full">
+              <Sparkles className="w-4 h-4 text-violet-300" />
+              <span className="text-sm text-slate-200 font-medium">
+                Build & publish with calm AI
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="text-4xl lg:text-5xl font-book font-semibold text-white leading-tight">
+                Create beautiful eBooks
+                <span className="block mt-2 bg-linear-to-r from-violet-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
+                  in a focused workspace
+                </span>
+              </h1>
+              <p className="text-base lg:text-lg text-slate-300 leading-relaxed max-w-xl">
+                BookForge helps you draft, organize, and publish with clarity.
+                Free users can create up to 5 books; Pro unlocks publishing.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                to={ctaLink}
+                className="group px-6 py-3.5 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-violet-500/40 transition-all inline-flex items-center justify-center gap-2"
+              >
+                Start free
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <a
+                href="#pricing"
+                className="px-6 py-3.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20 inline-flex items-center justify-center"
+              >
+                View pricing
+              </a>
+              <Link
+                to="/library"
+                className="px-6 py-3.5 bg-white/5 text-white/90 rounded-xl font-semibold hover:bg-white/10 transition-all border border-white/10 inline-flex items-center justify-center"
+              >
+                Browse library
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 pt-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div className="text-xl font-book text-white">5</div>
+                <div className="text-xs text-slate-300">Free books</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div className="text-xl font-book text-white">1-click</div>
+                <div className="text-xs text-slate-300">Publishing</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div className="text-xl font-book text-white">AI</div>
+                <div className="text-xs text-slate-300">Drafting</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/20 blur-2xl"></div>
+            <div className="relative rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-linear-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                    <BookOpen className="w-4.5 h-4.5 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold">
+                      The Calm Writer
+                    </div>
+                    <div className="text-xs text-slate-400">Draft in progress</div>
+                  </div>
+                </div>
+                <span className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                  Chapter 4
                 </span>
               </div>
 
-              <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl xl:text-6xl font-bold text-white leading-tight">
-                  Write & Publish
-                  <span className="block mt-2 bg-linear-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
-                    Beautiful E-Books
-                  </span>
-                </h1>
-
-                <p className="text-xl text-slate-400 leading-relaxed max-w-xl">
-                  Create professional e-books in minutes with AI-powered tools.
-                  No design skills needed.
-                </p>
+              <div className="space-y-2">
+                <div className="h-2.5 rounded-full bg-slate-800 w-full"></div>
+                <div className="h-2.5 rounded-full bg-slate-800 w-5/6"></div>
+                <div className="h-2.5 rounded-full bg-slate-800 w-4/6"></div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to={isAuthenticated ? "/dashboard" : "/login"}
-                  className="group px-8 py-4 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-violet-500/50 transition-all flex items-center justify-center gap-2"
-                >
-                  Get Started Free
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <button className="px-8 py-4 bg-slate-800 text-white rounded-xl font-semibold hover:bg-slate-700 transition-all border border-slate-700">
-                  View Demo
-                </button>
-              </div>
-
-              {/* Stats */}
-              <div className="flex gap-8 pt-4">
-                <div>
-                  <div className="text-3xl font-bold text-white">50,000+</div>
-                  <div className="text-slate-400 text-sm">Books Published</div>
-                </div>
-                <div className="border-l border-slate-800 pl-8">
-                  <div className="flex items-center gap-2">
-                    <div className="text-3xl font-bold text-white">4.9</div>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-5 h-5 fill-yellow-400 text-yellow-400"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-slate-400 text-sm">User Rating</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Content - Book Display */}
-            <div className="relative">
-              <div className="relative">
-                {/* Main Book Card */}
-                <div className="relative z-20 bg-linear-to-br from-slate-800 to-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-700">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-linear-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center">
-                        <Book className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">
-                          My First E-Book
-                        </div>
-                        <div className="text-sm text-slate-400">
-                          In Progress
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="h-3 bg-slate-700 rounded-full w-full"></div>
-                      <div className="h-3 bg-slate-700 rounded-full w-5/6"></div>
-                      <div className="h-3 bg-slate-700 rounded-full w-4/6"></div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 pt-4">
-                      <div className="bg-slate-800 rounded-lg p-3 text-center border border-slate-700">
-                        <div className="text-2xl font-bold text-white">12</div>
-                        <div className="text-xs text-slate-400">Chapters</div>
-                      </div>
-                      <div className="bg-slate-800 rounded-lg p-3 text-center border border-slate-700">
-                        <div className="text-2xl font-bold text-white">45</div>
-                        <div className="text-xs text-slate-400">Pages</div>
-                      </div>
-                      <div className="bg-slate-800 rounded-lg p-3 text-center border border-slate-700">
-                        <div className="text-2xl font-bold text-violet-400">
-                          78%
-                        </div>
-                        <div className="text-xs text-slate-400">Done</div>
-                      </div>
-                    </div>
+              <div className="grid grid-cols-3 gap-3 pt-5">
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-2.5 text-center">
+                  <Wand2 className="w-4.5 h-4.5 text-violet-300 mx-auto" />
+                  <div className="text-[11px] text-slate-400 mt-2">
+                    AI Drafts
                   </div>
                 </div>
-
-                {/* Floating Elements */}
-                <div className="absolute -top-6 -right-6 w-32 h-32 bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 rounded-2xl backdrop-blur-xl border border-violet-500/20 flex items-center justify-center z-10">
-                  <Sparkles className="w-12 h-12 text-violet-400" />
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-2.5 text-center">
+                  <Layers3 className="w-4.5 h-4.5 text-fuchsia-300 mx-auto" />
+                  <div className="text-[11px] text-slate-400 mt-2">
+                    Structure
+                  </div>
                 </div>
-                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-linear-to-br from-fuchsia-500/20 to-pink-500/20 rounded-2xl backdrop-blur-xl border border-fuchsia-500/20 flex items-center justify-center z-10">
-                  <Zap className="w-12 h-12 text-fuchsia-400" />
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-2.5 text-center">
+                  <BookOpen className="w-4.5 h-4.5 text-pink-300 mx-auto" />
+                  <div className="text-[11px] text-slate-400 mt-2">
+                    Publish
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/70 p-3.5">
+                <div className="text-xs text-slate-400 mb-2">
+                  Suggested outline
+                </div>
+                <div className="space-y-2">
+                  <div className="h-2 rounded-full bg-slate-800 w-5/6"></div>
+                  <div className="h-2 rounded-full bg-slate-800 w-3/4"></div>
+                  <div className="h-2 rounded-full bg-slate-800 w-2/3"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

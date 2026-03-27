@@ -1,6 +1,8 @@
 import React from "react";
 import HeroSection from "../components/heroSection/HeroSection";
 import Feature from "../components/feature/Feature";
+import Testimonials from "../components/testimonials/Testimonials";
+import Pricing from "../components/pricing/Pricing";
 import CallToAction from "../components/cta/CallToAction";
 import Footer from "../components/footer/Footer";
 import Navbar from "../components/layout/Navbar";
@@ -11,6 +13,8 @@ const LandingPage = () => {
       <Navbar />
       <HeroSection />
       <Feature />
+      <Testimonials />
+      <Pricing />
       <CallToAction />
       <Footer />
     </div>

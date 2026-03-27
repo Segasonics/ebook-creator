@@ -54,18 +54,20 @@ const SortableItem = ({
         <span className="truncate">{chapter.title}</span>
       </button>
       <div className="flex items-center ml-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity px-2 py-3 absolute right-0">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onGenerateChapterContent(index)}
-          isLoading={isGenerating}
-          title="Generate Content with AI"
-          className="py-2 px-2"
-        >
-          {isGenerating !== index && (
-            <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-          )}
-        </Button>
+        {!chapter.content?.trim() && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onGenerateChapterContent(index)}
+            isLoading={isGenerating}
+            title="Generate Content with AI"
+            className="py-2 px-2"
+          >
+            {isGenerating !== index && (
+              <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+            )}
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="small"

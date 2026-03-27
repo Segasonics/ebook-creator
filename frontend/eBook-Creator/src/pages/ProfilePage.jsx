@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { User, Mail } from "lucide-react";
+import { User, Mail, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import InputField from "../components/ui/InputField";
@@ -45,12 +46,23 @@ const ProfilePage = () => {
   return (
     <DashboardLayout activeMenu="profile">
       <div className="max-w-2xl mx-auto px-5">
-        <h1 className="text-xl md:text-2xl font-bold text-slate-800 mb-2 mt-10">
-          Profile
-        </h1>
-        <p className="text-sm text-slate-600 mb-8">
-          Manage your profile information
-        </p>
+        <div className="mt-10 mb-6">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors mb-3"
+          >
+            <span className="w-7 h-7 rounded-full border border-slate-200 bg-white flex items-center justify-center">
+              <ArrowLeft className="w-4 h-4" />
+            </span>
+            Back to Dashboard
+          </Link>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800">
+            Profile
+          </h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Manage your profile information
+          </p>
+        </div>
 
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -4,6 +4,8 @@ export interface IUser {
   password: string;
   avatar: string;
   isPro: boolean;
+  credits: number;
+  creditsResetAt: Date;
 }
 
 export interface IUserMethods {

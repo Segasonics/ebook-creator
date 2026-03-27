@@ -7,18 +7,20 @@ const ViewChapterSidebar = ({
   onSelectChapter,
   isOpen,
   onClose,
+  topOffsetClass = "top-16 lg:top-0",
+  heightClass = "h-[calc(100vh-64px)] lg:h-full",
 }) => {
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" />
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden" />
       )}
 
       {/* Sidebar */}
       <div
         className={`
-    fixed lg:relative left-0 top-0 h-full w-80 bg-white border-r border-slate-100 transform transition-transform duration-300 ease-in-out z-50
+    fixed lg:relative left-0 ${topOffsetClass} ${heightClass} w-80 bg-white border-r border-slate-100 transform transition-transform duration-300 ease-in-out z-40
     ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
     `}
       >

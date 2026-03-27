@@ -177,7 +177,9 @@ const ChapterEditorTab = ({
                 icon={Sparkles}
                 size="sm"
               >
-                Generate with AI
+                {currentChapter.content?.trim()
+                  ? "Regenerate with AI"
+                  : "Generate with AI"}
               </Button>
             </div>
           </div>
